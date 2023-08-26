@@ -1,8 +1,10 @@
-var orden = 2
+var g_orden = 3
+var time;
 
 function setup() {
     createCanvas(500, 500);
     background(0);
+    time = 0;
     
     var canvas = document.getElementById('defaultCanvas0');
     //var size = width; // Usamos el ancho del lienzo como tamaño
@@ -13,7 +15,32 @@ function setup() {
 
   function draw() {
     background(0);
-    hilbertDemo(canvas, width);
+    puntos1 = hilbertDemo(canvas, width, g_orden - 1);
+    puntos2 = hilbertDemo(canvas, width, g_orden);
+    puntos0 = [];
+    for (let i = 0; i < puntos2.length; i++) {
+        j = int(map(i, 0, puntos2.length, 0, puntos1.length))
+        puntos0.push([map(sin(time), -1, 1, puntos1[j][0], puntos2[i][0]), map(sin(time), -1, 1, puntos1[j][1], puntos2[i][1])])
+        //const element = array[i];
+    }
+    
+    var blockSize1 = (width / 2**g_orden);
+    var offset1 = blockSize1 / 2;
+
+    stroke(time*100,100,100);
+    strokeWeight(2);
+    noFill();
+    beginShape();
+    for (let i = 0; i < puntos2.length; i++) {
+        //stroke(map(i, 0, puntos.length, 0, 100), 100,100);
+        vertex(puntos0[i][0] * blockSize1 + offset1, puntos0[i][1] * blockSize1 + offset1);
+    }
+    endShape();
+
+    time += 0.01;
+    if (time > 99999){
+        time = 0;
+    }
   }
   
   function hindex2xy(hindex, N) {
@@ -64,8 +91,9 @@ function setup() {
     function last2bits(x) { return (x & 3); }
 }
   
-  function hilbertDemo(canvas, size) {
+  function hilbertDemo(canvas, size, orden) {
     var ctx = canvas.getContext('2d');
+    var listica = [];
   
     //stroke(0);
     //ctx.strokeStyle = 'red';
@@ -87,6 +115,7 @@ function setup() {
       fill(map(i, 0, N * N, 0, 100), 100, 100); //Color de los circulos
   
       curr = hindex2xy(i, N);
+      listica.push(curr);
   
       
       if (i > 0) { // Evitar la línea desde el primer punto
@@ -98,6 +127,7 @@ function setup() {
   
       prev = curr;
     }
+    return listica;
   
     function dot(point, blockSize, offset) {
       var r = 7 - orden;
@@ -115,12 +145,12 @@ function setup() {
     }
   
     function line(from, to, blockSize, offset) {
-      var off = offset;
-  
-      ctx.beginPath();
-      ctx.moveTo(from[0] * blockSize + off, from[1] * blockSize + off);
-      ctx.lineTo(to[0] * blockSize + off, to[1] * blockSize + off);
-      ctx.stroke();
-    }
+        let off = offset;
+        
+        /*beginShape();
+        vertex(from[0] * blockSize + off, from[1] * blockSize + off);
+        vertex(to[0] * blockSize + off, to[1] * blockSize + off);
+        endShape(CLOSE);*/
+      }
   }
   
