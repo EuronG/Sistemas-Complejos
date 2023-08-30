@@ -1,5 +1,5 @@
 var g_orden = 1
-var time, indices0, blockSize, offset, n;
+var time, t0, t1, indices0, indices1, blockSize, offset, n;
 
 function setup() {
     createCanvas(700, 700);
@@ -31,7 +31,7 @@ function setup() {
         circle(coord[0], coord[1], 50);
         indices0.push(coord);
     }
-
+    indices1 = indices0;
     
     colorMode(HSB, 100);
   }
@@ -42,10 +42,7 @@ function setup() {
     strokeWeight(1);
     line(0, height/2,width,height/2);
     line(width/2, 0, width/2, height);
-    //n = 2**g_orden;
-    //console.log(indices0);
-    //blockSize = (width / n);
-    //offset = blockSize / 2;
+
 
     
     fill(80, 100, 100);
@@ -58,12 +55,19 @@ function setup() {
     stroke(0, 100, 100);
     strokeWeight(7);
     beginShape();
-    indices0.forEach(i => {
-        vertex(i[0], i[1]);
-    });
+    if (time < t1){
+        for (let i = 0; i < indices1.length; i++) {
+            j = int(i%indices0.length);
+            vertex(map(time, t0, t1, indices0[j][0], indices1[i][0]), map(time, t0, t1, indices0[j][1], indices1[i][1]));
+        }
+    } else {
+        indices0 = indices1;
+        indices1.forEach(i => {
+            vertex(i[0], i[1]);
+        });
+    }
     endShape();
-    //nextIt(indices0);
-    //console.log(blockSize);
+    time += 0.01;
   }
 
   function hindex2xy(hindex, N) {
@@ -115,9 +119,10 @@ function setup() {
 }
 
 function nextIt(ind0) {
+    ind1 = ind0;
     g_orden += 1;
     n = 2**(g_orden);
-    indices0 = [];
+    //indices0 = [];
     var prevBlockSize = blockSize;
     blockSize = (width / n);
     offset = blockSize / 2;
@@ -125,9 +130,8 @@ function nextIt(ind0) {
     var n2 = [];
     var n3 = [];
     var n4 = [];
-        ind0.forEach(i => {
+        ind1.forEach(i => {
         var temp = [i[0]/prevBlockSize, i[1]/prevBlockSize];
-        var offsetlocal = width/4;
         n1.push([temp[0]*blockSize, temp[1]*blockSize]);
         n2.push([temp[0]*blockSize, temp[1]*blockSize + (width/2)]);
         n3.push([temp[0]*blockSize + (width/2), temp[1]*blockSize + (width/2)]);
@@ -137,25 +141,41 @@ function nextIt(ind0) {
 }
 
 function rotation(ind0){
-    console.log("hhh");
-    console.log(indices0);
-    for (let i = 0; i < ind0.length/4; i++) {
-        tempx = ind0[i][0];
-        ind0[i][0] = ind0[i][1];
-        ind0[i][1] = tempx;
+    var ind1 = ind0.map((item) => item.slice());
+    for (let i = 0; i < ind1.length/4; i++) {
+        tempx = ind1[i][0];
+        ind1[i][0] = ind1[i][1];
+        ind1[i][1] = tempx;
     }
-    for (let i = ind0.length*3/4; i < ind0.length; i++) {
-        tempx = ind0[i][0];
-        ind0[i][0] = width - ind0[i][1];
-        ind0[i][1] = width - tempx;
+    for (let i = ind1.length*3/4; i < ind1.length; i++) {
+        tempx = ind1[i][0];
+        ind1[i][0] = width - ind1[i][1];
+        ind1[i][1] = width - tempx;
     }
-    console.log(indices0);
-    //return ind0;
+    return ind1;
 }
 
+function arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+  
+    for (let i = 0; i < arr1.length; i++) {
+      if (!arr1[i].every((value, index) => value === arr2[i][index])) {
+        return false;
+      }
+    }
+  
+    return true;
+  }
+
 function toggle1(){
-    indices0 = nextIt(indices0);
+    t0 = time;
+    t1 = time + 1;
+    indices1 = nextIt(indices0);
 }
 function toggle2(){
-    rotation(indices0);
+    t0 = time;
+    t1 = time + 1;
+    indices1 = rotation(indices0);
 }
