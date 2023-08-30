@@ -1,9 +1,22 @@
-var g_orden = 3
+var g_orden = 4
 var time;
 
 function setup() {
-    createCanvas(500, 500);
+    createCanvas(700, 700);
     background(0);
+    p1_value = 1;
+    p1_prev = 1;
+    b1_value = false;
+    b2_value = true;
+    button1 = createButton("-");
+    p1 = createP(p1_value);
+    button2 = createButton("+");
+    div1 = createDiv();
+    div1.child(button1);
+    div1.child(p1);
+    div1.child(button2);
+    button1.mousePressed(toggle1);
+    button2.mousePressed(toggle2);
     time = 0;
     
     var canvas = document.getElementById('defaultCanvas0');
@@ -23,17 +36,14 @@ function setup() {
         puntos0.push([map(sin(time), -1, 1, puntos1[j][0], puntos2[i][0]), map(sin(time), -1, 1, puntos1[j][1], puntos2[i][1])])
         //const element = array[i];
     }
-    
-    var blockSize1 = (width / 2**g_orden);
-    var offset1 = blockSize1 / 2;
 
-    stroke(time*100,100,100);
-    strokeWeight(2);
+    stroke(map(sin(time), -1, 1, 0, 100),100,100);
+    strokeWeight(1);
     noFill();
     beginShape();
     for (let i = 0; i < puntos2.length; i++) {
         //stroke(map(i, 0, puntos.length, 0, 100), 100,100);
-        vertex(puntos0[i][0] * blockSize1 + offset1, puntos0[i][1] * blockSize1 + offset1);
+        vertex(puntos0[i][0] , puntos0[i][1] );
     }
     endShape();
 
@@ -115,42 +125,27 @@ function setup() {
       fill(map(i, 0, N * N, 0, 100), 100, 100); //Color de los circulos
   
       curr = hindex2xy(i, N);
+      console.log(curr);
+      curr[0] = curr[0] * blockSize + offset;
+      curr[1] = curr[1] * blockSize + offset;
       listica.push(curr);
-  
-      
-      if (i > 0) { // Evitar la línea desde el primer punto
-        line(prev, curr, blockSize, offset);
-        //line(prev[0], prev[1], curr[0], curr[1]);
-      }
-      dot(curr, blockSize, offset);
-      //circle(curr[0], blockSize + offset, 7);
   
       prev = curr;
     }
     return listica;
-  
-    function dot(point, blockSize, offset) {
-      var r = 7 - orden;
-      if (orden > 6){
-        r = 1
-      }  
-      
-      var x = point[0],
-        y = point[1];
-  
-      
-      ctx.beginPath();
-      ctx.arc(x * blockSize + offset, y * blockSize + offset, r, 0, 2 * Math.PI);
-      //ctx.fill();
+  }
+
+  function toggle1(){
+    if (p1_value > 1) {
+        p1.html(p1_value-1);
+        p1_value -= 1;
     }
-  
-    function line(from, to, blockSize, offset) {
-        let off = offset;
-        
-        /*beginShape();
-        vertex(from[0] * blockSize + off, from[1] * blockSize + off);
-        vertex(to[0] * blockSize + off, to[1] * blockSize + off);
-        endShape(CLOSE);*/
-      }
+  }
+
+  function toggle2(){
+    if (p1_value < 9) {
+        p1.html(p1_value+1);
+        p1_value += 1;
+    }
   }
   
