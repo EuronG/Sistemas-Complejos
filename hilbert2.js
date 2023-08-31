@@ -44,29 +44,44 @@ function setup() {
     line(width/2, 0, width/2, height);
 
 
-    
-    fill(80, 100, 100);
-    noStroke();
-    indices0.forEach(i => {
-        circle(i[0], i[1], 25);
-    });
-
     noFill();
     stroke(0, 100, 100);
     strokeWeight(7);
-    beginShape();
+    
     if (time < t1){
-        for (let i = 0; i < indices1.length; i++) {
-            j = int(i%indices0.length);
-            vertex(map(time, t0, t1, indices0[j][0], indices1[i][0]), map(time, t0, t1, indices0[j][1], indices1[i][1]));
+        
+        for (let j = 0; j < 4; j++) {
+            stroke(0, 100, 100);
+            noFill();
+            beginShape();
+            for (let i = 0 + j*4; i < indices1.length*(j+1)/4; i++) {
+                k = int(i%indices0.length);
+                vertex(map(time, t0, t1, indices0[k][0], indices1[i][0]), map(time, t0, t1, indices0[k][1], indices1[i][1]));
+            }
+            endShape();
+
+            fill(80, 100, 100);
+            noStroke();
+            for (let i = 0 + j*4; i < indices1.length*(j+1)/4; i++) {
+                k = int(i%indices0.length);
+                circle(map(time, t0, t1, indices0[k][0], indices1[i][0]), map(time, t0, t1, indices0[k][1], indices1[i][1]), 10);
+            }
         }
+        
     } else {
+        beginShape();
         indices0 = indices1;
         indices1.forEach(i => {
             vertex(i[0], i[1]);
         });
+        endShape();
+        fill(80, 100, 100);
+        noStroke();
+        indices1.forEach(i => {
+            circle(i[0], i[1], 10);
+        }); 
     }
-    endShape();
+    
     time += 0.01;
   }
 
@@ -154,20 +169,6 @@ function rotation(ind0){
     }
     return ind1;
 }
-
-function arraysEqual(arr1, arr2) {
-    if (arr1.length !== arr2.length) {
-      return false;
-    }
-  
-    for (let i = 0; i < arr1.length; i++) {
-      if (!arr1[i].every((value, index) => value === arr2[i][index])) {
-        return false;
-      }
-    }
-  
-    return true;
-  }
 
 function toggle1(){
     t0 = time;
